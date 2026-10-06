@@ -1,0 +1,521 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="Santa Ana College Guided Pathways activity: align your pillar subcommittee work with the College Educational Plan goals and objectives, then download your whiteboard as a PDF.">
+<title>Pillars to CEP Alignment</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@75..100,500..900&family=Source+Sans+3:ital,wght@0,400;0,600;0,700;1,400&family=Kalam:wght@400;700&display=swap">
+<style>
+/* Layout: a jamboard. Side menu of draggable cards on the left, a dotted whiteboard on the right with a pillar banner feeding a flow chart of sticky notes. */
+:root{
+  --bg:#f3f1f1; --surface:#ffffff; --ink:#1d1a1b; --muted:#625a5c; --line:#dcd4d5; --wire:#8f8486;
+  --accent:#b0323a; --accent-ink:#ffffff; --accent-soft:#f6e3e4; --ok:#2f6b4f;
+  --board:#fbfbfa; --dot:#d9d3d4;
+  --note-ink:#231f1c; --goal-note:#ffe98f; --obj-note:#cfe5fb; --who-note:#cdeccd;
+  --display:"Archivo","Arial Narrow",Arial,sans-serif;
+  --body:"Source Sans 3","Segoe UI",system-ui,sans-serif;
+  --hand:"Kalam","Segoe Print","Comic Sans MS",cursive;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#151213; --surface:#211d1e; --ink:#f1ecec; --muted:#b2a8aa; --line:#3a3335; --wire:#7d7274;
+  --accent:#e2646b; --accent-ink:#1a0d0e; --accent-soft:#3a2224; --ok:#7cc3a0;
+  --board:#1c191a; --dot:#363032;
+  --note-ink:#231f1c; --goal-note:#e8d47a; --obj-note:#a9c8e6; --who-note:#a9d2aa; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#151213; --surface:#211d1e; --ink:#f1ecec; --muted:#b2a8aa; --line:#3a3335; --wire:#7d7274;
+  --accent:#e2646b; --accent-ink:#1a0d0e; --accent-soft:#3a2224; --ok:#7cc3a0;
+  --board:#1c191a; --dot:#363032;
+  --note-ink:#231f1c; --goal-note:#e8d47a; --obj-note:#a9c8e6; --who-note:#a9d2aa; color-scheme:dark}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.5}
+body.dragging{cursor:grabbing;user-select:none}
+.wrap{max-width:1180px;margin:0 auto;padding-inline:16px;padding-block:24px 56px;display:grid;gap:20px}
+header{display:grid;gap:4px}
+.eyebrow{font-family:var(--display);font-weight:700;font-size:.76rem;letter-spacing:.12em;text-transform:uppercase;color:var(--accent)}
+h1{font-family:var(--display);font-weight:900;font-stretch:80%;font-size:clamp(1.9rem,5vw,2.8rem);line-height:1;margin:0;text-transform:uppercase;text-wrap:balance}
+h2{font-family:var(--display);font-weight:800;font-stretch:85%;font-size:1.45rem;line-height:1.15;margin:0;text-wrap:balance}
+h3{font-family:var(--display);font-weight:800;font-size:1rem;margin:0}
+p{margin:0}
+.lede{color:var(--muted);max-width:66ch}
+button{font:inherit;color:inherit}
+button:focus-visible,input:focus-visible,textarea:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+
+.tabs{display:flex;gap:4px;border-bottom:2px solid var(--line)}
+.tab{font:700 .92rem var(--display);letter-spacing:.04em;text-transform:uppercase;background:none;border:0;color:var(--muted);padding:10px 14px;margin-bottom:-2px;border-bottom:3px solid transparent;cursor:pointer}
+.tab[aria-selected="true"]{color:var(--ink);border-color:var(--accent)}
+.count{font-variant-numeric:tabular-nums;background:var(--accent-soft);color:var(--accent);border-radius:99px;padding:1px 8px;margin-left:6px;font-size:.8rem}
+
+.rail{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;list-style:none;padding:0;margin:0}
+.rail li{display:grid;gap:6px;font:700 .74rem var(--display);letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.rail li::before{content:"";height:6px;border-radius:3px;background:var(--line)}
+.rail li.done::before,.rail li.now::before{background:var(--accent)}
+.rail li.now{color:var(--ink)}
+@media (max-width:640px){.rail li span{display:none}.rail li.now span{display:inline}}
+
+.prompt{display:grid;gap:4px}
+.hint{color:var(--muted);font-size:.95rem}
+
+/* pillar picker */
+.picker{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px}
+.pick{display:grid;gap:6px;text-align:left;background:var(--surface);border:1.5px solid var(--line);border-radius:6px;padding:16px;cursor:pointer;align-content:start}
+.pick:hover{border-color:var(--accent)}
+.pick.on{border-color:var(--accent);background:var(--accent-soft)}
+.pick .t{font:900 1.25rem var(--display);font-stretch:85%;text-transform:uppercase;line-height:1.05}
+.pick .d{color:var(--muted);font-size:.93rem}
+.tag{display:inline-block;justify-self:start;font:800 .72rem var(--display);letter-spacing:.1em;text-transform:uppercase;background:var(--accent);color:var(--accent-ink);padding:3px 9px;border-radius:2px}
+
+/* workspace */
+.work{display:grid;grid-template-columns:300px minmax(0,1fr);gap:16px;align-items:start}
+.work.full{grid-template-columns:minmax(0,1fr)}
+@media (max-width:820px){.work{grid-template-columns:minmax(0,1fr)}}
+.tray{position:sticky;top:calc(env(safe-area-inset-top,0px) + 12px);background:var(--surface);border:1.5px solid var(--line);border-radius:8px;display:grid;gap:10px;padding:14px;max-height:calc(100vh - 24px);overflow:auto}
+@media (max-width:820px){.tray{position:static;max-height:46vh}}
+.tray h3{text-transform:uppercase;letter-spacing:.05em}
+.tray .hint{font-size:.88rem}
+.tray .grp{font:800 .72rem var(--display);letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-top:6px}
+.card{display:grid;grid-template-columns:18px 1fr;gap:8px;text-align:left;border:0;border-radius:3px;padding:10px 10px 10px 6px;cursor:grab;color:var(--note-ink);box-shadow:0 1px 0 rgba(0,0,0,.08),0 3px 8px rgba(0,0,0,.08);transition:transform .12s, box-shadow .12s}
+.card:hover{transform:translateY(-1px) rotate(-.4deg);box-shadow:0 2px 0 rgba(0,0,0,.08),0 8px 16px rgba(0,0,0,.12)}
+.card.goal{background:var(--goal-note)} .card.obj{background:var(--obj-note)}
+.card .k{font:800 .78rem var(--display);letter-spacing:.06em;text-transform:uppercase}
+.card .x{font-size:.86rem;line-height:1.35}
+.card.used{opacity:.4;cursor:default;transform:none;box-shadow:none}
+.card.used .k::after{content:" · on board";text-transform:none;letter-spacing:0;font-weight:600}
+.grip{width:18px;align-self:stretch;touch-action:none;cursor:grab;background-image:radial-gradient(currentColor 1.2px,transparent 1.4px);background-size:6px 6px;background-position:3px 2px;opacity:.45;border-radius:2px}
+.drag-ghost{position:fixed;left:0;top:0;z-index:50;pointer-events:none;transform-origin:center;rotate:2deg;box-shadow:0 14px 30px rgba(0,0,0,.25)!important;opacity:.95}
+
+.board{position:relative;min-width:0;min-height:420px;border:1.5px solid var(--line);border-radius:8px;padding:20px;background-color:var(--board);background-image:radial-gradient(var(--dot) 1.2px,transparent 1.3px);background-size:22px 22px;display:grid;justify-items:center;align-content:start;transition:box-shadow .15s}
+.board.over{box-shadow:0 0 0 3px var(--accent) inset}
+.banner{width:100%;max-width:760px;background:var(--accent);color:var(--accent-ink);border-radius:4px;padding:14px 18px;display:grid;gap:4px;box-shadow:0 4px 0 rgba(0,0,0,.12)}
+.banner .row{display:flex;flex-wrap:wrap;gap:8px;justify-content:space-between;align-items:center}
+.banner small{font:800 .74rem var(--display);letter-spacing:.14em;text-transform:uppercase;opacity:.85}
+.banner strong{font:900 clamp(1.4rem,3.4vw,2rem) var(--display);font-stretch:80%;text-transform:uppercase;line-height:1}
+.banner p{font-size:.93rem;opacity:.92;max-width:70ch}
+.banner button{background:transparent;border:1.5px solid currentColor;border-radius:3px;padding:3px 10px;font:700 .74rem var(--display);letter-spacing:.06em;text-transform:uppercase;color:inherit;cursor:pointer}
+.stem{width:0;height:26px;border-left:2px dashed var(--wire)}
+.flow{position:relative;width:100%;display:grid;grid-template-columns:repeat(var(--cols,1),minmax(0,1fr));gap:24px;padding-top:24px}
+.flow.two::before{content:"";position:absolute;top:0;left:25%;right:25%;border-top:2px dashed var(--wire)}
+@media (max-width:640px){.flow{grid-template-columns:minmax(0,1fr)!important}.flow.two::before{display:none}}
+.col{position:relative;display:grid;gap:0;justify-items:center;align-content:start;min-width:0}
+.col::before{content:"";position:absolute;top:-24px;left:50%;height:24px;border-left:2px dashed var(--wire)}
+.note{position:relative;width:100%;max-width:360px;color:var(--note-ink);border-radius:2px;padding:14px 14px 12px;box-shadow:0 1px 0 rgba(0,0,0,.08),0 6px 14px rgba(0,0,0,.12);display:grid;gap:8px}
+.note.goal{background:var(--goal-note);rotate:-.6deg}
+.col:nth-child(2) .note.goal{rotate:.7deg}
+.note .k{font:800 .8rem var(--display);letter-spacing:.08em;text-transform:uppercase}
+.note .x{font-size:.9rem;line-height:1.4}
+.note .rm{position:absolute;top:6px;right:6px;width:26px;height:26px;border:0;border-radius:50%;background:rgba(0,0,0,.08);color:var(--note-ink);cursor:pointer;font:700 1rem/1 var(--body)}
+.note .rm:hover{background:rgba(0,0,0,.16)}
+.why{display:grid;gap:4px;border-top:1.5px dashed rgba(0,0,0,.25);padding-top:8px}
+.why label{font:700 .8rem var(--display);letter-spacing:.03em}
+.why textarea,.who textarea{width:100%;resize:vertical;min-height:72px;font:400 1.02rem/1.35 var(--hand);color:var(--note-ink);background:rgba(255,255,255,.45);border:1.5px solid rgba(0,0,0,.2);border-radius:3px;padding:6px 8px}
+.why textarea:focus,.who textarea:focus{border-color:var(--note-ink);outline:none;background:rgba(255,255,255,.7)}
+.why .said{font:400 1.05rem/1.35 var(--hand)}
+.objs{width:100%;max-width:360px;display:grid;gap:10px;padding:14px 0 0 22px;margin-left:22px;border-left:2px dashed var(--wire);justify-self:start}
+@media (min-width:641px){.objs{justify-self:center;margin-left:0}}
+.note.obj{background:var(--obj-note);padding:10px 34px 10px 12px;gap:2px;max-width:none}
+.note.obj::before{content:"";position:absolute;left:-24px;top:50%;width:22px;border-top:2px dashed var(--wire)}
+.slot{width:100%;max-width:360px;border:2px dashed var(--wire);border-radius:4px;padding:18px 14px;text-align:center;color:var(--muted);font-size:.92rem;display:grid;gap:2px;background:color-mix(in srgb,var(--board) 80%,transparent)}
+.slot b{font-family:var(--display);text-transform:uppercase;letter-spacing:.05em;font-size:.82rem;color:var(--ink)}
+.slot.small{padding:10px;font-size:.86rem}
+.slot.target{border-color:var(--accent);color:var(--accent);background:var(--accent-soft)}
+.who{width:100%;max-width:820px;margin-top:30px;display:grid;gap:12px;justify-items:center}
+.who h3{font-size:1.15rem;text-align:center;text-wrap:balance;max-width:52ch}
+.who .notes{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;width:100%}
+@media (max-width:640px){.who .notes{grid-template-columns:minmax(0,1fr)}}
+.note.whonote{background:var(--who-note);max-width:none}
+.note.whonote:nth-child(2){rotate:.8deg}.note.whonote:nth-child(1){rotate:-.8deg}
+.who textarea{min-height:64px}
+.who .said{font:700 1.15rem/1.3 var(--hand)}
+.who-label{font:800 .72rem var(--display);letter-spacing:.1em;text-transform:uppercase;opacity:.7}
+
+.nav{display:flex;flex-wrap:wrap;gap:10px;justify-content:space-between;align-items:center}
+.btn{font:800 .92rem var(--display);letter-spacing:.05em;text-transform:uppercase;padding:11px 18px;border-radius:4px;border:2px solid var(--accent);background:var(--accent);color:var(--accent-ink);cursor:pointer}
+.btn.ghost{background:transparent;color:var(--ink);border-color:var(--line)}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.status{font-size:.9rem;color:var(--muted);min-height:1.4em;flex:1 1 220px;text-align:center}
+.status.err{color:var(--accent)} .status.ok{color:var(--ok)}
+
+/* reports */
+.report{background:var(--surface);border:2px solid var(--accent);border-radius:6px;display:grid}
+.report .rh{display:flex;flex-wrap:wrap;gap:10px 16px;justify-content:space-between;align-items:center;padding:14px 18px;background:var(--accent-soft)}
+.report .rh h2{font-size:1.3rem;text-transform:uppercase}
+.actions{display:flex;flex-wrap:wrap;gap:8px}
+.report .btn{padding:8px 13px;font-size:.8rem}
+.rbody{padding:16px 18px;display:grid;gap:14px}
+.rsec{display:grid;gap:6px}
+.lbl{font:800 .74rem var(--display);letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.rgoal{display:grid;gap:4px;padding-left:12px;border-left:3px solid var(--accent)}
+.rgoal .q{font-style:italic}
+.rgoal ul{margin:2px 0 0;padding-left:1.1em;font-size:.95rem}
+.rstatus{padding:0 18px 14px;font-size:.9rem;color:var(--muted);min-height:1.2em}
+.rstatus.ok{color:var(--ok)} .rstatus.err{color:var(--accent)}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px}
+.stat{display:grid;gap:2px}
+.stat b{font:900 1.9rem var(--display);font-variant-numeric:tabular-nums;line-height:1}
+.stat span{font-size:.88rem;color:var(--muted)}
+.findings{margin:0;padding-left:1.2em;display:grid;gap:6px}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.two-col>div{min-width:0;display:grid;gap:8px;align-content:start}
+@media (max-width:640px){.two-col{grid-template-columns:1fr}}
+.bar{display:grid;grid-template-columns:3.2rem 1fr 1.6rem;gap:8px;align-items:center;font-size:.9rem}
+.bar.wide{grid-template-columns:minmax(6.5rem,auto) 1fr 1.6rem}
+.bar .track{height:10px;background:var(--accent-soft);border-radius:2px;overflow:hidden}
+.bar .fill{display:block;height:100%;background:var(--accent)}
+.bar .v{text-align:right;font-variant-numeric:tabular-nums;color:var(--muted)}
+.bar .k{font:800 .82rem var(--display);font-variant-numeric:tabular-nums}
+.tally{list-style:none;margin:0;padding:0;display:grid;gap:4px;font-size:.92rem}
+.tally li{display:flex;justify-content:space-between;gap:10px;border-bottom:1px solid var(--line);padding-block:3px}
+.tally li span:last-child{font-variant-numeric:tabular-nums;color:var(--muted);white-space:nowrap}
+.group{display:grid;gap:20px}
+.pblock{background:var(--surface);border:1.5px solid var(--line);border-radius:6px;display:grid}
+.pblock .ph{display:flex;flex-wrap:wrap;gap:6px 16px;justify-content:space-between;align-items:baseline;padding:14px 18px;border-bottom:1.5px solid var(--line)}
+.pblock .ph h3{font-size:1.1rem;text-transform:uppercase}
+.pblock .ph span{color:var(--muted);font-size:.9rem;font-variant-numeric:tabular-nums}
+.people{list-style:none;margin:0;padding:16px 18px;display:grid;gap:16px}
+.people li{display:grid;gap:6px}
+.people .who-n{font-weight:700}
+.people .reason{font-size:.93rem;color:var(--muted)}
+.people .reason b{color:var(--ink)}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{background:var(--who-note);color:var(--note-ink);border-radius:2px;padding:2px 10px;font-size:.88rem}
+.chip.o{background:var(--obj-note)}
+.empty{padding:28px 18px;text-align:center;color:var(--muted);display:grid;gap:6px;background:var(--surface);border:1.5px dashed var(--line);border-radius:6px}
+.empty strong{color:var(--ink);font-family:var(--display);text-transform:uppercase;letter-spacing:.04em}
+.none{color:var(--muted);font-size:.9rem;font-style:italic;padding:14px 18px}
+.copybox{width:100%;min-height:160px;font:.85rem/1.4 ui-monospace,Menlo,monospace;margin:0 18px 14px;width:calc(100% - 36px)}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}.note,.drag-ghost{rotate:0deg!important}}
+.namefield{display:grid;gap:4px;max-width:420px}
+.namefield label{font:800 .74rem var(--display);letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.namefield input{font:inherit;padding:10px 12px;border:1.5px solid var(--line);border-radius:4px;background:var(--surface);color:var(--ink)}
+.namefield input:focus{border-color:var(--accent);outline:none}
+.site-foot{color:var(--muted);font-size:.85rem;text-align:center}
+</style>
+
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="eyebrow">Santa Ana College · Guided Pathways × College Educational Plan</div>
+    <h1>Pillars to CEP Alignment</h1>
+    <p class="lede">Build your subcommittee's whiteboard: start with a pillar, drag in the CEP goals and objectives that connect to it, and name who else could help.</p>
+  </header>
+
+  <section id="view-act" style="display:grid;gap:18px">
+    <ol class="rail" id="rail">
+      <li><span>1 · Pillar</span></li><li><span>2 · Goals & why</span></li><li><span>3 · Objectives</span></li><li><span>4 · Contributors</span></li><li><span>5 · Report</span></li>
+    </ol>
+    <div class="prompt" id="prompt"></div>
+    <div id="stage"></div>
+    <div class="nav" id="nav">
+      <button class="btn ghost" id="back">Back</button>
+      <span class="status" id="status" role="status"></span>
+      <button class="btn" id="next">Next</button>
+    </div>
+  </section>
+  <p class="site-foot">Your answers stay in this browser. Nothing is sent anywhere until you download your PDF and share it.</p>
+</div>
+
+<script>
+const PILLARS = [
+  {id:1,name:"Clarify the Path",desc:"Help students explore educational and career options, select a program of study, and understand the pathway to their degree, certificate, transfer, or career goal."},
+  {id:2,name:"Enter the Path",desc:"Help students successfully transition into SAC, complete onboarding and enrollment, enter an academic pathway, and build early academic momentum."},
+  {id:3,name:"Stay on the Path",desc:"Help students remain enrolled, connected, and progressing toward their educational goals through proactive support, timely intervention, and a strong sense of belonging."},
+  {id:4,name:"Ensure Learning to Completion",desc:"Support students in achieving learning outcomes and workforce competencies while progressing toward completion, transfer, and career goals."}
+];
+const GOALS = [
+  {id:1,text:"Ensure equitable access to innovative educational programs and comprehensive support services fostering student success in achieving workforce readiness, successful transfer opportunities and personal developmental goals.",
+   obj:[["1.1","Eliminate barriers to educational opportunities."],["1.2","Diversify learning opportunities to meet the needs of students."],["1.3","Promote and expand student support services to address holistic needs of students, particularly from marginalized and/or underrepresented groups."],["1.4","Increase skill development, credential attainment, transfer rates and living wage."]]},
+  {id:2,text:"Expand partnerships to optimize educational options and opportunities through innovative services and equitable practices.",
+   obj:[["2.1","Identify current and develop potential partnerships to meet community needs."],["2.2","Provide diverse educational options to support student academic goals and success."],["2.3","Foster innovative, student informed services to facilitate academic achievement."],["2.4","Assess and improve current DEIA practices to foster a community of trust and belonging."]]},
+  {id:3,text:"Cultivate equitable campus culture to support student, faculty, and staff belonging and success.",
+   obj:[["3.1","Leverage cutting-edge technology to remove barriers and improve the employee and student experience."],["3.2","Utilize accurate and reliable disaggregated information to make informed decisions."],["3.3","Collaborate and leverage professional development opportunities across partnerships."],["3.4","Ensure participatory governance practices are understood, followed, utilized and evaluated regularly."]]},
+  {id:4,text:"Strengthen supportive infrastructure that facilitates equity, a sense of belonging, and trust among faculty, staff, and students.",
+   obj:[["4.1","Improve physical and virtual infrastructure and enhance technology resources to create conducive learning environments and promote sustainability in support of the overall education experience and academic success of students."],["4.2","Maximize funding and allocate resources to support equitable student achievement, sustainable growth, innovation, and competitive advantage."],["4.3","Provide comprehensive professional development programs that empower faculty and staff with continuous learning opportunities, fostering expertise, innovation, equity, community, and a dynamic educational environment."]]}
+];
+const OBJ_TEXT={}; GOALS.forEach(g=>g.obj.forEach(([k,t])=>OBJ_TEXT[k]=t));
+const goalOf=k=>+k.split('.')[0];
+const CONTRIB_Q="Please name 3 people, positions, and/or programs whose input could contribute to this pillar's subcommittee.";
+const EX_Q="Give an example of how this objective relates to the goals of this pillar.";
+
+let state={pillar:null,goals:[],objectives:[],examples:{},contributors:["","",""]};
+let phase=0, who='';
+const $=s=>document.querySelector(s);
+const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const pillarOf=id=>PILLARS.find(p=>p.id===+id);
+
+/* ---------- render ---------- */
+const PROMPTS=[
+  ["Which pillar subcommittee most closely aligns with your work?","Choose one. It becomes the banner at the top of your whiteboard."],
+  ["Drag 1 or 2 CEP goals under your pillar.","Read each goal in the menu and drag the ones most closely related onto the board. For each goal, write 1 or 2 sentences on why it relates to the pillar."],
+  ["Drag the objectives that relate to this pillar onto your flow chart.","The menu shows the objectives under the goals you chose. Each one lands under its goal. For each objective you place, give an example of how it relates to the goals of this pillar."],
+  [CONTRIB_Q,"Write one on each sticky note."],
+  ["Your whiteboard report","Here is a summary of your board. Download it as a PDF to keep or share."]
+];
+function render(){
+  saveDraft();
+  document.querySelectorAll('#rail li').forEach((li,i)=>li.className=i<phase?'done':i===phase?'now':'');
+  $('#prompt').innerHTML=`<h2>${PROMPTS[phase][0]}</h2><p class="hint">${PROMPTS[phase][1]}</p>`;
+  const st=$('#stage');
+  if(phase===0) st.innerHTML=pickerHTML();
+  else if(phase===4) st.innerHTML=myReportHTML();
+  else st.innerHTML=`<div class="work ${phase===3?'full':''}">${phase<3?trayHTML():''}${boardHTML()}</div>`;
+  bind(); updateNav();
+}
+function pickerHTML(){
+  return `<div class="picker">${PILLARS.map(p=>`<button class="pick ${state.pillar===p.id?'on':''}" data-pillar="${p.id}" aria-pressed="${state.pillar===p.id}">
+    <span class="tag">Pillar ${p.id} Subcommittee</span><span class="t">${p.name}</span><span class="d">${p.desc}</span></button>`).join('')}</div>`;
+}
+function trayHTML(){
+  if(phase===1){
+    return `<aside class="tray" aria-label="CEP goals menu"><h3>CEP Goals</h3><p class="hint">Drag a goal onto the board, or tap it to add. Up to 2.</p>
+      ${GOALS.map(g=>{const used=state.goals.some(x=>x.id===g.id);
+        return `<button class="card goal ${used?'used':''}" data-type="goal" data-id="${g.id}" ${used?'disabled':''} aria-label="Add Goal ${g.id} to the board">
+          <span class="grip" aria-hidden="true"></span><span><span class="k">Goal ${g.id}</span><br><span class="x">${g.text}</span></span></button>`}).join('')}</aside>`;
+  }
+  return `<aside class="tray" aria-label="CEP objectives menu"><h3>CEP Objectives</h3><p class="hint">Drag the objectives that relate to your pillar onto the board, or tap to add.</p>
+    ${state.goals.map(sg=>{const g=GOALS.find(x=>x.id===sg.id);
+      return `<div class="grp">Goal ${g.id}</div>${g.obj.map(([k,t])=>{const used=state.objectives.includes(k);
+        return `<button class="card obj ${used?'used':''}" data-type="obj" data-id="${k}" ${used?'disabled':''} aria-label="Add Objective ${k} to the board">
+          <span class="grip" aria-hidden="true"></span><span><span class="k">Objective ${k}</span><br><span class="x">${t}</span></span></button>`}).join('')}`}).join('')}</aside>`;
+}
+function boardHTML(readonly){
+  const p=pillarOf(state.pillar);
+  const cols=state.goals.length+(phase===1&&state.goals.length<2&&!readonly?1:0);
+  const colsHTML=state.goals.map(sg=>{const g=GOALS.find(x=>x.id===sg.id);
+    const objs=state.objectives.filter(k=>goalOf(k)===g.id);
+    const editWhy=phase<=2&&!readonly;
+    return `<div class="col"><div class="note goal">
+        ${phase===1&&!readonly?`<button class="rm" data-rm-goal="${g.id}" aria-label="Remove Goal ${g.id}">×</button>`:''}
+        <span class="k">Goal ${g.id}</span><span class="x">${g.text}</span>
+        <div class="why">${editWhy?`<label for="why-${g.id}">In 1 or 2 sentences, why does this goal relate to the pillar?</label>
+          <textarea id="why-${g.id}" data-why="${g.id}" maxlength="600" placeholder="This goal connects because…">${esc(sg.reason)}</textarea>`
+          :`<span class="who-label">Why it relates</span><span class="said">${esc(sg.reason)}</span>`}</div></div>
+      ${phase>=2||objs.length?`<div class="objs">${objs.map(k=>`<div class="note obj">
+          ${phase===2&&!readonly?`<button class="rm" data-rm-obj="${k}" aria-label="Remove Objective ${k}">×</button>`:''}
+          <span class="k">Objective ${k}</span><span class="x">${OBJ_TEXT[k]}</span>
+          <div class="why">${phase===2&&!readonly?`<label for="ex-${k.replace('.','-')}">${EX_Q}</label>
+            <textarea id="ex-${k.replace('.','-')}" data-ex="${k}" maxlength="600" placeholder="For example…">${esc(state.examples[k])}</textarea>`
+            :`<span class="who-label">Example</span><span class="said">${esc(state.examples[k])}</span>`}</div></div>`).join('')}
+        ${phase===2&&!readonly?`<div class="slot small" data-slot-goal="${g.id}"><b>Drop objectives here</b>for Goal ${g.id}</div>`:''}</div>`:''}
+    </div>`}).join('')
+    +(phase===1&&state.goals.length<2&&!readonly?`<div class="col"><div class="slot" id="goal-slot"><b>${state.goals.length?'Optional: add a second goal':'Drag a goal here'}</b>${state.goals.length?'or continue with one':'from the CEP Goals menu'}</div></div>`:'');
+  const who=phase>=3?`<div class="who"><div class="stem" style="height:20px"></div><h3>${CONTRIB_Q}</h3>
+    <div class="notes">${[0,1,2].map(i=>`<div class="note whonote"><span class="who-label">${i+1}</span>
+      ${phase===3&&!readonly?`<textarea id="who-${i}" data-who="${i}" maxlength="140" aria-label="Person, position or program ${i+1}" placeholder="${['e.g. Counseling Division','e.g. Peer Success Coaches','e.g. Career Center director'][i]}">${esc(state.contributors[i])}</textarea>`
+      :`<span class="said">${esc(state.contributors[i])}</span>`}</div>`).join('')}</div></div>`:'';
+  return `<div class="board" id="board">
+    <div class="banner"><div class="row"><small>Pillar ${p.id} Subcommittee</small>${phase>0&&phase<4&&!readonly?'<button data-act="change-pillar">Change pillar</button>':''}</div>
+      <strong>${p.name}</strong><p>${p.desc}</p></div>
+    ${cols?`<div class="stem"></div><div class="flow ${cols>1?'two':''}" style="--cols:${cols}">${colsHTML}</div>`:''}
+    ${who}</div>`;
+}
+function myReportHTML(){
+  const p=pillarOf(state.pillar);
+  return `<article class="report" id="my-report"><div class="rh"><h2>My whiteboard report</h2><div class="actions">
+      <button class="btn" data-act="pdf-mine">Download PDF</button><button class="btn ghost" data-act="edit">Edit my board</button><button class="btn ghost" data-act="restart">Start over</button></div></div>
+    <div class="rbody">
+      <div class="rsec"><span class="lbl">Pillar</span><h3 style="font-size:1.2rem">Pillar ${p.id} Subcommittee: ${p.name}</h3></div>
+      <div class="rsec"><span class="lbl">CEP goals, why they relate, and connected objectives</span>
+        ${state.goals.map(sg=>{const objs=state.objectives.filter(k=>goalOf(k)===sg.id);
+          return `<div class="rgoal"><b>Goal ${sg.id}</b><span class="q">“${esc(sg.reason)}”</span>
+            <ul>${objs.length?objs.map(k=>`<li><b>${k}</b> ${OBJ_TEXT[k]}<br><i>Example: ${esc(state.examples[k])}</i></li>`).join(''):'<li>No objectives placed under this goal.</li>'}</ul></div>`}).join('')}</div>
+      <div class="rsec"><span class="lbl">People, positions or programs who could contribute</span>
+        <div class="chips">${state.contributors.map(c=>`<span class="chip">${esc(c)}</span>`).join('')}</div></div>
+      <div class="namefield"><label for="who-name">Your name (optional, shown on the PDF)</label><input id="who-name" type="text" maxlength="80" value="${esc(who)}" placeholder="e.g. Jordan Rivera, Counseling"></div>
+    </div><p class="rstatus" role="status"></p></article>
+    <div style="margin-top:20px">${boardHTML(true)}</div>`;
+}
+
+/* ---------- interactions ---------- */
+let drag=null, suppressClick=false;
+function bind(){
+  document.querySelectorAll('[data-pillar]').forEach(b=>b.onclick=()=>{state.pillar=+b.dataset.pillar;render();});
+  document.querySelectorAll('.card[data-type]:not(.used)').forEach(bindDrag);
+  document.querySelectorAll('[data-rm-goal]').forEach(b=>b.onclick=()=>{const id=+b.dataset.rmGoal;
+    state.goals=state.goals.filter(g=>g.id!==id); state.objectives=state.objectives.filter(k=>goalOf(k)!==id); render();});
+  document.querySelectorAll('[data-rm-obj]').forEach(b=>b.onclick=()=>{state.objectives=state.objectives.filter(k=>k!==b.dataset.rmObj);render();});
+  document.querySelectorAll('[data-why]').forEach(t=>t.oninput=()=>{const g=state.goals.find(g=>g.id===+t.dataset.why);if(g)g.reason=t.value;updateNav();});
+  document.querySelectorAll('[data-ex]').forEach(t=>t.oninput=()=>{state.examples[t.dataset.ex]=t.value;updateNav();});
+  $('#who-name')&&($('#who-name').oninput=e=>{who=e.target.value;saveDraft();});
+  document.querySelectorAll('[data-who]').forEach(t=>t.oninput=()=>{state.contributors[+t.dataset.who]=t.value;updateNav();});
+}
+function bindDrag(el){
+  const payload={type:el.dataset.type,id:el.dataset.type==='goal'?+el.dataset.id:el.dataset.id};
+  el.addEventListener('pointerdown',e=>{
+    if(e.button>0) return;
+    if(e.pointerType!=='mouse'&&!e.target.closest('.grip')) return;
+    if(e.pointerType==='mouse') e.preventDefault();
+    drag={el,payload,x:e.clientX,y:e.clientY,moved:false};
+    try{el.setPointerCapture(e.pointerId);}catch(_){}
+  });
+  el.addEventListener('pointermove',e=>{
+    if(!drag||drag.el!==el) return;
+    if(!drag.moved){
+      if(Math.hypot(e.clientX-drag.x,e.clientY-drag.y)<6) return;
+      const r=el.getBoundingClientRect(); drag.ox=drag.x-r.left; drag.oy=drag.y-r.top; drag.moved=true;
+      const g=el.cloneNode(true); g.classList.add('drag-ghost'); g.style.width=r.width+'px'; document.body.appendChild(g); drag.ghost=g;
+      document.body.classList.add('dragging'); highlight(payload,true);
+    }
+    drag.ghost.style.translate=`${e.clientX-drag.ox}px ${e.clientY-drag.oy}px`;
+    $('#board')?.classList.toggle('over',overBoard(e));
+  });
+  const end=(e,cancel)=>{
+    if(!drag||drag.el!==el) return;
+    const d=drag; drag=null;
+    if(!d.moved) return;
+    d.ghost.remove(); document.body.classList.remove('dragging'); highlight(payload,false);
+    const ok=!cancel&&overBoard(e); $('#board')?.classList.remove('over'); suppressClick=true;
+    setTimeout(()=>suppressClick=false,50);
+    if(ok) place(payload); else flash('Drop it on the whiteboard to add it.');
+  };
+  el.addEventListener('pointerup',e=>end(e,false));
+  el.addEventListener('pointercancel',e=>end(e,true));
+  el.addEventListener('click',()=>{ if(suppressClick){suppressClick=false;return;} place(payload); });
+}
+function overBoard(e){const t=document.elementFromPoint(e.clientX,e.clientY);return !!(t&&t.closest&&t.closest('#board'));}
+function highlight(p,on){
+  if(p.type==='goal') $('#goal-slot')?.classList.toggle('target',on);
+  else document.querySelector(`[data-slot-goal="${goalOf(p.id)}"]`)?.classList.toggle('target',on);
+}
+function place(p){
+  if(p.type==='goal'){
+    if(state.goals.some(g=>g.id===p.id)) return;
+    if(state.goals.length>=2){flash('You can place up to 2 goals. Remove one with × to swap.');return;}
+    state.goals.push({id:p.id,reason:''}); state.goals.sort((a,b)=>a.id-b.id); render();
+    const t=$('#why-'+p.id); if(t){t.focus({preventScroll:true}); t.scrollIntoView({block:'nearest',behavior:'smooth'});}
+  }else{
+    if(state.objectives.includes(p.id)) return;
+    state.objectives.push(p.id); state.objectives.sort((a,b)=>a.localeCompare(b,undefined,{numeric:true})); render();
+    const t=$('#ex-'+p.id.replace('.','-')); if(t){t.focus({preventScroll:true}); t.scrollIntoView({block:'nearest',behavior:'smooth'});}
+  }
+}
+let flashT;
+function flash(msg){const s=$('#status');s.className='status err';s.textContent=msg;clearTimeout(flashT);flashT=setTimeout(updateNav,2600);}
+
+function valid(){
+  if(phase===0) return !!state.pillar;
+  if(phase===1) return state.goals.length>=1&&state.goals.every(g=>g.reason.trim().length>=10);
+  if(phase===2) return state.objectives.length>=1&&state.objectives.every(k=>(state.examples[k]||'').trim().length>=10);
+  if(phase===3) return state.contributors.every(c=>c.trim());
+  return true;
+}
+function updateNav(){
+  saveDraft();
+  const back=$('#back'),next=$('#next'),s=$('#status');
+  $('#nav').hidden=phase===4;
+  s.className='status';
+  back.hidden=phase===0;
+  next.textContent=phase===3?'Finish & see report':'Next';
+  next.disabled=!valid();
+  s.textContent=valid()?'':[
+    'Choose a pillar to continue.',
+    !state.goals.length?'Drag at least one goal onto the board.':'Write 1 or 2 sentences for each goal on the board.',
+    !state.objectives.length?'Place at least one objective on the board.':'Write an example for each objective on the board.',
+    'Fill in all three sticky notes.'][phase]||'';
+}
+$('#back').onclick=()=>{phase=Math.max(0,phase-1);render();window.scrollTo({top:0});};
+$('#next').onclick=async()=>{
+  if(!valid()) return;
+  if(phase<3){phase++;render();window.scrollTo({top:0});return;}
+  $('#next').disabled=true; $('#status').textContent='Saving…';
+  phase=4; render(); window.scrollTo({top:0});
+};
+document.addEventListener('click',e=>{
+  const b=e.target.closest('[data-act]'); if(!b) return;
+  const act=b.dataset.act, rep=b.closest('.report'), rs=rep?.querySelector('.rstatus');
+  if(act==='change-pillar'){phase=0;render();window.scrollTo({top:0});}
+  else if(act==='edit'){phase=1;render();window.scrollTo({top:0});}
+  else if(act==='restart'){if(b.dataset.confirm){startOver();}else{b.dataset.confirm='1';b.textContent='Tap again to clear';setTimeout(()=>{if(b.isConnected){delete b.dataset.confirm;b.textContent='Start over';}},3000);}}
+  else if(act==='pdf-mine') downloadPDF('mine',rs,b);
+});
+/* ---------- reports ---------- */
+/* ---------- PDF export ---------- */
+const PDF_C={red:[176,50,58],ink:[35,31,28],muted:[98,90,92],goal:[255,233,143],obj:[207,229,251],who:[205,236,205],line:[220,212,213],soft:[246,227,228]};
+let jspdfP=null;
+function loadJsPDF(){
+  if(window.jspdf) return Promise.resolve(window.jspdf);
+  if(!jspdfP) jspdfP=new Promise((res,rej)=>{const sc=document.createElement('script');
+    sc.src='https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js';
+    sc.onload=()=>window.jspdf?res(window.jspdf):rej(new Error('load'));sc.onerror=()=>{jspdfP=null;rej(new Error('load'));};document.head.appendChild(sc);});
+  return jspdfP;
+}
+const pdfSafe=t=>String(t??'').replace(/[‘’]/g,"'").replace(/[“”]/g,'"').replace(/[–—]/g,'-').replace(/…/g,'...').replace(/×/g,'x').replace(/[^\x09\x0A\x0D\x20-\x7E -ÿ•]/g,'');
+function makePDF(jspdf){
+  const d=new jspdf.jsPDF({unit:'pt',format:'letter'}); const M=50,PW=612,PH=792,W=PW-2*M;
+  const P={d,y:M,M,W};
+  P.page=()=>{d.addPage();P.y=M;};
+  P.need=h=>{if(P.y+h>PH-M){P.page();return true;}return false;};
+  P.lines=(t,size,w,bold)=>{d.setFont('helvetica',bold?'bold':'normal');d.setFontSize(size);return d.splitTextToSize(pdfSafe(t),w);};
+  P.text=(t,{size=10.5,bold=false,color=PDF_C.ink,indent=0,gap=4,lh=1.32}={})=>{
+    const ls=P.lines(t,size,W-indent,bold);
+    ls.forEach(l=>{P.need(size*lh);d.setFont('helvetica',bold?'bold':'normal');d.setFontSize(size);d.setTextColor(...color);d.text(l,M+indent,P.y+size);P.y+=size*lh;});
+    P.y+=gap;
+  };
+  // a colored block made of parts [{t,size,bold,color}], kept together on one page when it fits
+  P.block=(parts,{fill,indent=0,pad=10,textColor=PDF_C.ink,gap=10}={})=>{
+    const w=W-indent-2*pad;
+    const laid=parts.map(pt=>({...pt,ls:P.lines(pt.t,pt.size||10.5,w,pt.bold),size:pt.size||10.5}));
+    const h=laid.reduce((a,pt)=>a+pt.ls.length*pt.size*1.32+(pt.after??4),0)+2*pad;
+    if(h<PH-2*M) P.need(h);
+    const x=M+indent; let y=P.y;
+    if(h<PH-2*M){d.setFillColor(...fill);d.rect(x,y,W-indent,h,'F');}
+    y+=pad;
+    laid.forEach(pt=>{pt.ls.forEach(l=>{if(y+pt.size*1.32>PH-M){d.addPage();y=M;}
+      d.setFont('helvetica',pt.bold?'bold':'normal');d.setFontSize(pt.size);d.setTextColor(...(pt.color||textColor));d.text(l,x+pad,y+pt.size);y+=pt.size*1.32;});y+=(pt.after??4);});
+    P.y=y+pad-(laid.length?0:0)+gap;
+  };
+  P.rule=()=>{P.need(12);d.setDrawColor(...PDF_C.line);d.setLineWidth(1);d.line(M,P.y,M+W,P.y);P.y+=12;};
+  P.header=(title,sub)=>{
+    d.setFont('helvetica','bold');d.setFontSize(8.5);d.setTextColor(...PDF_C.red);d.text('SANTA ANA COLLEGE  |  GUIDED PATHWAYS x COLLEGE EDUCATIONAL PLAN',M,P.y+8);P.y+=18;
+    P.text(title,{size:20,bold:true,gap:2});
+    P.text(sub,{size:10,color:PDF_C.muted,gap:10});
+  };
+  P.footer=()=>{const n=d.getNumberOfPages();for(let i=1;i<=n;i++){d.setPage(i);d.setFont('helvetica','normal');d.setFontSize(8.5);d.setTextColor(...PDF_C.muted);
+    d.text('Pillars to CEP Alignment',M,PH-28);d.text(`Page ${i} of ${n}`,PW-M,PH-28,{align:'right'});}};
+  return P;
+}
+const today=()=>new Date().toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'});
+function buildMinePDF(jspdf){
+  const P=makePDF(jspdf), p=pillarOf(state.pillar);
+  const whoLine=who.trim()?who.trim()+'  |  ':'';
+  P.header('My Whiteboard Report',`${whoLine}${today()}`);
+  P.block([{t:`PILLAR ${p.id} SUBCOMMITTEE`,size:8.5,bold:true,after:2},{t:p.name.toUpperCase(),size:18,bold:true,after:4},{t:p.desc,size:10}],{fill:PDF_C.red,textColor:[255,255,255],pad:14,gap:14});
+  state.goals.forEach(sg=>{const g=GOALS.find(x=>x.id===sg.id);
+    P.block([{t:`GOAL ${g.id}`,size:9,bold:true,after:3},{t:g.text,size:10.5,after:8},{t:'Why this goal relates to the pillar',size:8.5,bold:true,color:PDF_C.muted,after:2},{t:sg.reason.trim(),size:11}],{fill:PDF_C.goal,gap:8});
+    state.objectives.filter(k=>goalOf(k)===g.id).forEach(k=>
+      P.block([{t:`OBJECTIVE ${k}`,size:8.5,bold:true,after:2},{t:OBJ_TEXT[k],size:10,after:6},{t:'Example of how it relates to this pillar',size:8.5,bold:true,color:PDF_C.muted,after:2},{t:(state.examples[k]||'').trim(),size:10.5}],{fill:PDF_C.obj,indent:28,gap:8}));
+    P.y+=6;});
+  P.block([{t:CONTRIB_Q,size:10.5,bold:true,after:6},...state.contributors.map((c,i)=>({t:`${i+1}.  ${c.trim()}`,size:11,after:3}))],{fill:PDF_C.who,gap:0});
+  P.footer(); return P.d;
+}
+async function downloadPDF(kind,rs,btn){
+  const say=(m,c)=>{if(rs){rs.className='rstatus '+(c||'');rs.textContent=m;}};
+  btn.disabled=true; say('Building PDF…');
+  try{
+    const jspdf=await loadJsPDF();
+    const doc=buildMinePDF(jspdf);
+    const p=pillarOf(state.pillar);
+    const slug=who.trim()?'-'+who.trim().toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,''):'';
+    const fname=`whiteboard-pillar-${p.id}-${p.name.toLowerCase().replace(/\s+/g,'-')}${slug}.pdf`;
+    const blob=doc.output('blob');
+    {const u=URL.createObjectURL(blob),a=document.createElement('a');a.href=u;a.download=fname;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),4000);}
+    say('PDF saved.','ok');
+  }catch(e){ say(e&&e.message==='load'?'The PDF tool could not load. Check your connection and try again.':'The PDF was not saved. Try again.','err'); }
+  finally{btn.disabled=false;}
+}
+
+/* ---------- keep work if the page is refreshed ---------- */
+const DRAFT_KEY='pillars-cep-whiteboard-v1';
+function saveDraft(){try{localStorage.setItem(DRAFT_KEY,JSON.stringify({state,phase,who}));}catch(_){}}
+function loadDraft(){try{const d=JSON.parse(localStorage.getItem(DRAFT_KEY)||'null');
+  if(d&&d.state&&d.state.pillar){state={pillar:d.state.pillar,goals:d.state.goals||[],objectives:d.state.objectives||[],examples:d.state.examples||{},contributors:d.state.contributors||["","",""]};phase=Math.min(+d.phase||0,4);who=d.who||'';}}catch(_){}}
+function startOver(){state={pillar:null,goals:[],objectives:[],examples:{},contributors:["","",""]};phase=0;who='';try{localStorage.removeItem(DRAFT_KEY);}catch(_){}render();window.scrollTo({top:0});}
+
+loadDraft();
+render();
+
+</script>
+</body>
+</html>
